@@ -1,38 +1,91 @@
-# Location Policy Test Cases
+# Location Policy - STRICT EU/EMEA + Worldwide Only
 
-## ✅ SHOULD PASS (Broad EU/EMEA or Worldwide)
+## 🎯 Policy Goal
+
+**Only allow jobs you can actually apply for without residency restrictions:**
+- ✅ Broad EU/EMEA remote (any EU country)
+- ✅ Worldwide/Work-from-anywhere remote (true global)
+- ❌ Single-country remote (even if EU) = residency requirement
+- ❌ US/Canada/Australia remote
+- ❌ City/state restricted remote
+
+## ✅ SHOULD PASS (Broad Regional or Worldwide)
 
 ```
-Remote, EMEA                                    → ALLOW (regional - EMEA)
-Remote - EMEA                                   → ALLOW (regional - EMEA)
-Home based - EMEA                              → ALLOW (regional - EMEA)
+Remote, EMEA                                    → ALLOW (regional - any EU/EMEA country)
+Remote - EMEA                                   → ALLOW (regional - EMEA wide)
+Home based - EMEA                              → ALLOW (regional - EMEA wide)
 Home based - Worldwide                         → ALLOW (worldwide WFA)
-Remote, Europe                                 → ALLOW (regional - Europe)
-Remote - EU                                    → ALLOW (regional - EU)
+Remote, Europe                                 → ALLOW (regional - Europe wide)
+Remote - EU                                    → ALLOW (regional - EU wide)
+Amsterdam, Netherlands; Berlin, Germany; Remote → ALLOW (multi-country EU)
 ```
 
-## ❌ SHOULD BLOCK (Single-country = Residency Restricted)
+## ❌ SHOULD BLOCK (Residency Restricted)
 
+**Single-Country Remote (Even if EU):**
 ```
-Remote - Poland                                → BLOCK (single-country, residency likely required)
-Remote - France                                → BLOCK (single-country, residency likely required)
-Remote (UK)                                    → BLOCK (single-country, residency likely required)
-Remote - Ireland                               → BLOCK (single-country, residency likely required)
-Toronto, Remote in Canada                      → BLOCK (blocked country + residency)
+Remote - Poland                                → BLOCK (Poland residency required)
+Remote - France                                → BLOCK (France residency required)
+Remote (UK)                                    → BLOCK (UK residency required)
+Remote - Ireland                               → BLOCK (Ireland residency required)
+Remote - Netherlands                           → BLOCK (NL residency required)
+Remote - Germany                               → BLOCK (DE residency required)
+```
+
+**Reason:** Even though these are EU countries, "Remote - [single country]" format typically means:
+- Must have work authorization in that specific country
+- Payroll/legal entity only in that country
+- Cannot work from other EU countries
+
+**Blocked Countries:**
+```
+Toronto, Remote in Canada                      → BLOCK (Canada + residency)
 Remote - USA                                   → BLOCK (blocked country)
 Remote (Seattle, WA only)                      → BLOCK (city/state restriction)
 Australia (Remote)                             → BLOCK (blocked country)
 ```
 
-## Logic
+## Logic Explanation
 
-**Single-country remote** (e.g., "Remote - Poland") is treated as **residency-restricted** because:
+**Why block "Remote - France" but allow "Remote, EMEA"?**
 
-1. Most companies use this format when they can only hire in that specific country (tax/legal/payroll)
-2. If they support EU-wide remote, they say "Remote, EMEA" or "Remote - Europe"
-3. Exception: If location mentions both country AND EMEA/EU (e.g., "Remote, Germany (EMEA)"), it passes
+1. **"Remote, EMEA"** = company supports hiring across EU/EMEA region (flexible location)
+2. **"Remote - France"** = company can only hire in France (payroll/legal constraint)
 
-**This is intentionally strict** to avoid jobs you can't actually apply for due to residency requirements.
+**Exception:** If location says BOTH country AND region (e.g., "Remote, France (EMEA)"), it passes because EMEA context indicates broader support.
+
+## If You Want Country-Specific Remote
+
+**If you live/work in Netherlands and want "Remote - Netherlands" to pass:**
+
+Add to your config:
+```json
+"geo": {
+  "allowed_single_countries": ["netherlands", "belgium", "germany"],
+  ...
+}
+```
+
+But by default, we block ALL single-country remote to avoid residency surprises.
+
+## Test Cases
+
+```
+✅ ALLOW:
+- Remote, EMEA
+- Home based - Worldwide  
+- Amsterdam; Berlin; Remote
+- Remote - Europe
+
+❌ BLOCK:
+- Remote - Poland (residency)
+- Remote - France (residency)
+- Remote (UK) (residency)
+- Remote - USA (blocked country)
+- Toronto, Remote in Canada (blocked country)
+- Remote (Seattle, WA only) (city restriction)
+```
 
 ## Title Blocks
 

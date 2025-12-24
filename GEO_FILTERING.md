@@ -60,19 +60,23 @@ Configured in `filters.geo`:
 ## Test Cases
 
 ```
-✅ ALLOW: "Cardiff, London or Remote (UK)"
-✅ ALLOW: "Paris, France; Remote - France"
-✅ ALLOW: "Amsterdam, Netherlands"
-✅ ALLOW: "Remote - EMEA"
+✅ ALLOW: "Remote, EMEA" (broad EU/EMEA)
+✅ ALLOW: "Home based - Worldwide" (true WFA)
+✅ ALLOW: "Amsterdam, Netherlands; Berlin, Germany" (multi-country EU)
+✅ ALLOW: "Remote - Europe" (broad regional)
 
-❌ BLOCK: "Remote - USA"
-❌ BLOCK: "Toronto, Remote in Canada"
-❌ BLOCK: "Australia (Remote)"
-❌ BLOCK: "Remote (Seattle, WA only)"
-❌ BLOCK: "Seattle, SF, NYC, Remote"
-❌ BLOCK: "Home based - Worldwide"
-❌ BLOCK: "Remote" (no region specified)
+❌ BLOCK: "Remote - USA" (blocked country)
+❌ BLOCK: "Toronto, Remote in Canada" (blocked country)
+❌ BLOCK: "Australia (Remote)" (blocked country)
+❌ BLOCK: "Remote (Seattle, WA only)" (city/state restriction)
+❌ BLOCK: "Remote - Poland" (single-country = residency requirement)
+❌ BLOCK: "Remote - France" (single-country = residency requirement)
+❌ BLOCK: "Remote (UK)" (single-country = residency requirement)
+❌ BLOCK: "Remote" (no region specified = ambiguous)
 ```
+
+**Key principle:** Single-country remote (even EU) = residency requirement = BLOCK by default.
+Only broad regional (EMEA/EU/Europe) or worldwide passes.
 
 ## Configuration Options
 

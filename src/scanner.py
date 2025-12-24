@@ -8,6 +8,7 @@ from .models import Job
 from .filtering import JobFilter
 from .state import StateManager
 from .alerting import SlackAlerter
+from .source_health import SourceHealth
 
 
 class JobScanner:
@@ -22,7 +23,8 @@ class JobScanner:
         max_workers: int = 10,
         dry_run: bool = False,
         explain: bool = False,
-        print_all: bool = False
+        print_all: bool = False,
+        skip_failed_sources: bool = True
     ):
         self.sources = sources
         self.filter = JobFilter(filter_config)
@@ -32,9 +34,14 @@ class JobScanner:
         self.dry_run = dry_run
         self.explain = explain
         self.print_all = print_all
+        self.skip_failed_sources = skip_failed_sources
+
+        # Source health tracking
+        self.source_health = SourceHealth()
 
         self.stats = {
             "sources_scanned": 0,
+            "sources_skipped": 0,
             "jobs_fetched": 0,
             "jobs_passed": 0,
             "jobs_new": 0,
@@ -49,6 +56,7 @@ class JobScanner:
 
         # Collect tasks
         tasks = []
+        skipped = 0
         for source_type, identifiers in self.sources.items():
             source_class = SOURCE_REGISTRY.get(source_type)
             if not source_class:
@@ -56,9 +64,21 @@ class JobScanner:
                 continue
 
             for identifier in identifiers:
+                # Check source health
+                if self.skip_failed_sources and self.source_health.should_skip(source_type, identifier):
+                    status = self.source_health.get_status(source_type, identifier)
+                    skipped += 1
+                    if self.explain:
+                        print(f"  ⏭️  Skipping {source_type}/{identifier} (status: {status})")
+                    continue
+
                 tasks.append((source_type, identifier, source_class))
 
+        if skipped > 0:
+            print(f"  ⏭️  Skipped {skipped} failed sources")
+
         print(f"  📦 Scanning {len(tasks)} sources...")
+        self.stats['sources_skipped'] = skipped
 
         # Fetch jobs in parallel
         all_jobs = []
@@ -73,8 +93,25 @@ class JobScanner:
                 try:
                     jobs = future.result()
                     all_jobs.extend(jobs)
+                    self.stats['sources_scanned'] += 1
+
+                    # Record success
+                    self.source_health.record_success(src_type, ident)
+
                     print(f"  ✓ {src_type}/{ident}: {len(jobs)} jobs")
                 except Exception as e:
+                    error_msg = str(e)
+
+                    # Extract HTTP status if available
+                    http_status = None
+                    if "404" in error_msg:
+                        http_status = 404
+                    elif "403" in error_msg:
+                        http_status = 403
+
+                    # Record failure
+                    self.source_health.record_failure(src_type, ident, error_msg, http_status)
+
                     print(f"  ✗ {src_type}/{ident}: {e}")
                     self.stats['errors'] += 1
 
@@ -120,7 +157,6 @@ class JobScanner:
     def _fetch_jobs(self, source_type: str, identifier: str, source_class) -> List[Job]:
         source = source_class()
         jobs = source.fetch_jobs(identifier)
-        self.stats['sources_scanned'] += 1
         self.stats['jobs_fetched'] += len(jobs)
         return jobs
 
@@ -158,11 +194,24 @@ class JobScanner:
         print("📊 SCAN SUMMARY")
         print(f"{'='*60}")
         print(f"  Sources scanned:   {self.stats['sources_scanned']}")
+        if self.stats['sources_skipped'] > 0:
+            print(f"  Sources skipped:   {self.stats['sources_skipped']} (failed)")
         print(f"  Jobs fetched:      {self.stats['jobs_fetched']}")
         print(f"  Jobs passed:       {self.stats['jobs_passed']}")
         print(f"  New jobs:          {self.stats['jobs_new']}")
         print(f"  Updated jobs:      {self.stats['jobs_updated']}")
         print(f"  Alerts sent:       {self.stats['alerts_sent']}")
         print(f"  Errors:            {self.stats['errors']}")
+
+        # Source health summary
+        health_stats = self.source_health.get_stats()
+        if health_stats.get('TEMP_FAIL', 0) > 0 or health_stats.get('PERM_FAIL', 0) > 0:
+            print(f"\n  Source Health:")
+            print(f"    OK:              {health_stats.get('OK', 0)}")
+            if health_stats.get('TEMP_FAIL', 0) > 0:
+                print(f"    TEMP_FAIL:       {health_stats['TEMP_FAIL']}")
+            if health_stats.get('PERM_FAIL', 0) > 0:
+                print(f"    PERM_FAIL:       {health_stats['PERM_FAIL']}")
+
         print(f"{'='*60}\n")
 

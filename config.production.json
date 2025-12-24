@@ -30,51 +30,25 @@
     }
   },
   "filters": {
+    "geo": {
+      "allowed_regions": [
+        "europe",
+        "emea",
+        "eu",
+        "european union",
+        "eea"
+      ],
+      "blocked_countries": [
+        "united states",
+        "usa",
+        "canada",
+        "australia",
+        "new zealand"
+      ],
+      "allow_worldwide_remote": true,
+      "allow_unknown_remote": false
+    },
     "require_remote": true,
-    "remote_positive": [
-      "remote",
-      "fully remote",
-      "distributed",
-      "remote-first",
-      "work from home",
-      "remote (global)",
-      "worldwide remote",
-      "global remote"
-    ],
-    "remote_negative": [
-      "hybrid",
-      "on-site",
-      "onsite",
-      "in-office",
-      "relocation required",
-      "not remote",
-      "no remote"
-    ],
-    "remote_anywhere_patterns": [
-      "remote worldwide",
-      "work from anywhere",
-      "global remote",
-      "worldwide",
-      "remote (global)"
-    ],
-    "allowed_regions": [
-      "europe",
-      "eu",
-      "emea",
-      "european union",
-      "netherlands",
-      "uk",
-      "germany",
-      "france",
-      "worldwide",
-      "global"
-    ],
-    "blocked_regions": [
-      "usa only",
-      "us only",
-      "united states only",
-      "canada only"
-    ],
     "title_allow_regex_any": [
       "site reliability",
       "\\bsre\\b",
@@ -96,16 +70,47 @@
       "people manager",
       "\\bmanager\\b",
       "architect",
+      "software architect",
+      "solutions architect",
       "kernel",
       "linux kernel",
       "machine learning",
       "\\bml\\b",
       "mlops",
       "data platform",
+      "data infrastructure",
+      "data engineer",
       "analytics",
+      "kafka",
+      "opensearch",
+      "elasticsearch",
       "security operations",
+      "security engineer",
+      "security architect",
+      "cloud security",
       "\\bsoc\\b",
-      "secops"
+      "secops",
+      "product manager",
+      "program manager",
+      "\\btpm\\b",
+      "technical program manager",
+      "strategy & operations",
+      "strategy and operations",
+      "partner manager",
+      "alliances",
+      "professional services",
+      "support engineer",
+      "customer support",
+      "technical support",
+      "field engineer",
+      "\\bdesigner\\b",
+      "ux designer",
+      "ui designer",
+      "project maintainer",
+      "\\bmaintainer\\b",
+      "ai assistant",
+      "ai infrastructure",
+      "consultant"
     ],
     "stack_groups": {
       "group_role": [
