@@ -243,7 +243,23 @@
       "frontend engineer",
       "\\bai engineer\\b",
       "machine learning engineer",
-      "data scientist"
+      "data scientist",
+      "product manager",
+      "program manager",
+      "tpm",
+      "technical program manager",
+      "strategy & operations",
+      "strategy and operations",
+      "partner manager",
+      "alliances",
+      "professional services",
+      "support engineer",
+      "customer support",
+      "field engineer",
+      "solutions architect",
+      "cloud support",
+      "junior cloud",
+      "\\bmanager\\b"
     ],
     "stack_groups": {
       "role": [
