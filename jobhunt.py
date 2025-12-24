@@ -30,11 +30,15 @@ def cmd_scan(args):
     config = Config(args.config)
     state = StateManager(config.get_state_path())
 
-    # Setup Slack
+    # Setup Slack - always try if webhook is available
     slack = None
-    webhook = config.get_slack_webhook()
-    if webhook and not args.dry_run:
-        slack = SlackAlerter(webhook)
+    if not args.dry_run:
+        webhook = config.get_slack_webhook()
+        if webhook:
+            print(f"✅ Slack webhook configured")
+            slack = SlackAlerter(webhook)
+        else:
+            print("⚠️  No Slack webhook found (set SLACK_WEBHOOK_URL env var)")
 
     # Create scanner
     scanner = JobScanner(

@@ -7,6 +7,12 @@ on:
 
   # Allow manual trigger
   workflow_dispatch:
+    inputs:
+      clear_cache:
+        description: 'Clear cache (force fresh scan)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   scan:
@@ -30,24 +36,38 @@ jobs:
         run: |
           mkdir -p .state
 
+      - name: Clear cache (if requested)
+        if: github.event.inputs.clear_cache == 'true'
+        run: |
+          echo "🗑️  Clearing state cache for fresh scan..."
+          rm -rf .state/*
+
       - name: Restore state from cache
         uses: actions/cache@v4
         with:
           path: .state/
-          key: jobscanner-state-${{ github.run_id }}
+          key: jobscanner-state-${{ github.run_number }}-${{ github.run_id }}
           restore-keys: |
+            jobscanner-state-${{ github.run_number }}-
             jobscanner-state-
+
+      - name: Debug environment
+        run: |
+          echo "🔍 Checking Slack webhook..."
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            echo "✅ Slack webhook SECRET exists in GitHub"
+            echo "   Length: ${#SLACK_WEBHOOK_URL} chars"
+          else
+            echo "❌ Slack webhook SECRET is NOT set in GitHub!"
+            echo "   Go to: https://github.com/${{ github.repository }}/settings/secrets/actions"
+          fi
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Run job scan
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          echo "🔍 Checking Slack webhook..."
-          if [ -n "$SLACK_WEBHOOK_URL" ]; then
-            echo "✅ Slack webhook is configured"
-          else
-            echo "❌ Slack webhook is NOT set!"
-          fi
           python3 jobhunt.py --config config.balanced.json scan
 
       - name: Save state to cache
@@ -55,7 +75,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: .state/
-          key: jobscanner-state-${{ github.run_id }}
+          key: jobscanner-state-${{ github.run_number }}-${{ github.run_id }}
 
       - name: Upload scan logs
         if: always()
