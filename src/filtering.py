@@ -4,6 +4,7 @@ Multi-stage filtering with explainability
 from typing import Dict, List, Tuple, Optional, Set
 import re
 from dataclasses import dataclass, field
+from .location_parser import GeoFilter, LocationInfo
 
 
 @dataclass
@@ -15,6 +16,7 @@ class FilterResult:
     gate_results: Dict[str, bool] = field(default_factory=dict)
     keyword_matches: Dict[str, List[str]] = field(default_factory=dict)
     scoring_breakdown: Dict[str, int] = field(default_factory=dict)
+    location_info: Optional[LocationInfo] = None
 
 
 class JobFilter:
@@ -22,6 +24,10 @@ class JobFilter:
 
     def __init__(self, config: dict):
         self.config = config
+
+        # Geo filter (NEW - first gate!)
+        geo_config = config.get("geo", {})
+        self.geo_filter = GeoFilter(geo_config) if geo_config else None
 
         # Remote patterns
         self.remote_positive = [p.lower() for p in config.get("remote_positive", [])]
@@ -54,19 +60,34 @@ class JobFilter:
         content_lower = job.content_text.lower()
         full_text = f"{title_lower} {location_lower} {content_lower}"
 
-        # GATE 1: Remote
-        remote_passed, remote_reason = self._check_remote_gate(location_lower, content_lower)
-        result.gate_results["remote"] = remote_passed
-        if not remote_passed:
-            result.drop_reason = f"Remote: {remote_reason}"
-            return result
+        # GATE 0: Geo-filtering (NEW - FIRST!)
+        if self.geo_filter:
+            geo_passed, geo_reason, loc_info = self.geo_filter.check_location(
+                job.location,
+                job.content_text
+            )
+            result.gate_results["geo"] = geo_passed
+            result.location_info = loc_info
 
-        # GATE 2: Region
-        region_passed, region_reason = self._check_region_gate(location_lower, content_lower)
-        result.gate_results["region"] = region_passed
-        if not region_passed:
-            result.drop_reason = f"Region: {region_reason}"
-            return result
+            if not geo_passed:
+                result.drop_reason = f"Geo: {geo_reason}"
+                return result
+
+        # GATE 1: Remote (LEGACY - kept for backwards compat if no geo config)
+        if not self.geo_filter:
+            remote_passed, remote_reason = self._check_remote_gate(location_lower, content_lower)
+            result.gate_results["remote"] = remote_passed
+            if not remote_passed:
+                result.drop_reason = f"Remote: {remote_reason}"
+                return result
+
+        # GATE 2: Region (LEGACY - skip if geo filter used)
+        if not self.geo_filter:
+            region_passed, region_reason = self._check_region_gate(location_lower, content_lower)
+            result.gate_results["region"] = region_passed
+            if not region_passed:
+                result.drop_reason = f"Region: {region_reason}"
+                return result
 
         # GATE 3: Title
         title_passed, title_reason = self._check_title_gate(title_lower)
@@ -239,10 +260,17 @@ class JobFilter:
         lines = [
             f"Job: {job.title} @ {job.company}",
             f"Location: {job.location}",
+        ]
+
+        # Location parsing info
+        if result.location_info:
+            lines.append(f"Parsed: {result.location_info}")
+
+        lines.extend([
             f"URL: {job.url}",
             "",
             "GATES:",
-        ]
+        ])
 
         for gate, passed in result.gate_results.items():
             status = "✓" if passed else "✗"

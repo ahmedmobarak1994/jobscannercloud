@@ -127,6 +127,41 @@
     }
   },
   "filters": {
+    "geo": {
+      "allowed_regions": [
+        "europe",
+        "emea",
+        "eu",
+        "european union",
+        "united kingdom",
+        "uk",
+        "netherlands",
+        "belgium",
+        "germany",
+        "france",
+        "spain",
+        "portugal",
+        "italy",
+        "sweden",
+        "norway",
+        "denmark",
+        "finland",
+        "poland",
+        "czech republic",
+        "austria",
+        "switzerland",
+        "ireland"
+      ],
+      "blocked_countries": [
+        "united states",
+        "usa",
+        "canada",
+        "australia",
+        "new zealand"
+      ],
+      "allow_worldwide_remote": false,
+      "allow_unknown_remote": false
+    },
     "require_remote": true,
     "remote_positive": [
       "remote",
