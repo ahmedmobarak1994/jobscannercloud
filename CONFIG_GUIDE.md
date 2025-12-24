@@ -1,5 +1,14 @@
 # Config Files Overview
 
+**✅ ONLY 3 CONFIGS IN REPO:**
+- `config.balanced.json` - MAIN (production)
+- `config.production.json` - Strict alternative  
+- `config.test.json` - Testing only
+
+**All other configs have been removed!**
+
+---
+
 ## 📋 Which Config to Use?
 
 ### `config.balanced.json` ⭐ **MAIN CONFIG**
