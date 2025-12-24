@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.yourname.jobhunt</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <!-- Pas dit aan naar jouw lokale pad -->
+      <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/.venv/bin/python</string>
+      <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/jobhunt.py</string>
+      <string>--config</string>
+      <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/config.json</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>7200</integer> <!-- 2 hours -->
+
+    <key>WorkingDirectory</key>
+    <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner</string>
+
+    <key>StandardOutPath</key>
+    <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/.state/jobhunt.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/.state/jobhunt.err.log</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+  </dict>
+</plist>

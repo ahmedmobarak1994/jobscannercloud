@@ -1,0 +1,198 @@
+{
+  "sources": {
+    "greenhouse": {
+      "boards": [
+        "gitlab",
+        "hashicorp",
+        "grafana",
+        "netlify",
+        "digitalocean",
+        "redhat",
+        "mongodb",
+        "elastic",
+        "puppet",
+        "datadog"
+      ]
+    },
+    "lever": {
+      "accounts": [
+        "octopus",
+        "twilio",
+        "cloudflare",
+        "stripe"
+      ]
+    },
+    "ashby": {
+      "job_boards": [
+        "1password",
+        "deel"
+      ]
+    }
+  },
+  "filters": {
+    "require_remote": true,
+    "remote_positive": [
+      "remote",
+      "fully remote",
+      "distributed",
+      "remote-first",
+      "work from home",
+      "remote (global)",
+      "worldwide remote",
+      "global remote"
+    ],
+    "remote_negative": [
+      "hybrid",
+      "on-site",
+      "onsite",
+      "in-office",
+      "relocation required",
+      "not remote",
+      "no remote"
+    ],
+    "remote_anywhere_patterns": [
+      "remote worldwide",
+      "work from anywhere",
+      "global remote",
+      "worldwide",
+      "remote (global)"
+    ],
+    "allowed_regions": [
+      "europe",
+      "eu",
+      "emea",
+      "european union",
+      "netherlands",
+      "uk",
+      "germany",
+      "france",
+      "worldwide",
+      "global"
+    ],
+    "blocked_regions": [
+      "usa only",
+      "us only",
+      "united states only",
+      "canada only"
+    ],
+    "title_allow_regex_any": [
+      "site reliability",
+      "\\bsre\\b",
+      "reliability engineer",
+      "production engineer",
+      "platform engineer",
+      "platform sre",
+      "devops engineer",
+      "cloud infrastructure engineer",
+      "cloud operations engineer",
+      "infrastructure engineer"
+    ],
+    "title_block_regex_any": [
+      "director",
+      "vp of",
+      "vice president",
+      "head of",
+      "engineering manager",
+      "people manager",
+      "\\bmanager\\b",
+      "architect",
+      "kernel",
+      "linux kernel",
+      "machine learning",
+      "\\bml\\b",
+      "mlops",
+      "data platform",
+      "analytics",
+      "security operations",
+      "\\bsoc\\b",
+      "secops"
+    ],
+    "stack_groups": {
+      "group_role": [
+        "sre",
+        "site reliability",
+        "reliability",
+        "devops",
+        "platform",
+        "production",
+        "infrastructure"
+      ],
+      "group_cloud_iac": [
+        "azure",
+        "aws",
+        "gcp",
+        "terraform",
+        "bicep",
+        "pulumi",
+        "kubernetes",
+        "k8s",
+        "helm",
+        "gitops",
+        "docker",
+        "containers"
+      ],
+      "group_ops_obs": [
+        "observability",
+        "prometheus",
+        "grafana",
+        "opentelemetry",
+        "incident",
+        "on-call",
+        "pagerduty",
+        "runbook",
+        "postmortem",
+        "slo",
+        "sli",
+        "error budget",
+        "monitoring"
+      ]
+    },
+    "min_stack_groups": 2,
+    "include_keywords": {
+      "sre": 20,
+      "site reliability": 20,
+      "reliability": 15,
+      "incident": 10,
+      "on-call": 10,
+      "pagerduty": 8,
+      "runbook": 8,
+      "postmortem": 8,
+      "slo": 12,
+      "sli": 12,
+      "error budget": 12,
+      "observability": 10,
+      "opentelemetry": 8,
+      "prometheus": 8,
+      "grafana": 8,
+      "terraform": 10,
+      "bicep": 10,
+      "azure devops": 10,
+      "azure": 8,
+      "kubernetes": 10,
+      "k8s": 10,
+      "helm": 8,
+      "gitops": 8,
+      "aks": 8,
+      "infrastructure as code": 8,
+      "ci/cd": 8,
+      "pipelines": 6
+    },
+    "title_bonus": {
+      "sre": 25,
+      "site reliability": 25,
+      "reliability": 20,
+      "platform": 15,
+      "production": 15,
+      "devops": 12
+    },
+    "min_score": 18
+  },
+  "alerts": {
+    "slack": {
+      "enabled": true,
+      "webhook_env": "SLACK_WEBHOOK_URL"
+    }
+  },
+  "state_path": ".state/jobhunt.sqlite"
+}
+

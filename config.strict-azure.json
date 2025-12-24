@@ -1,0 +1,221 @@
+{
+  "sources": {
+    "greenhouse": {
+      "boards": [
+        "gitlab",
+        "remotecom",
+        "automatticjobs",
+        "typeform",
+        "grafanalabs",
+        "tailscale",
+        "doitintl",
+        "canonical",
+        "sourcegraph91",
+        "customerio",
+        "datadog",
+        "cloudflare",
+        "honeycomb",
+        "newrelic",
+        "snyk",
+        "castaigroupinc",
+        "prolific",
+        "nebius",
+        "speechmatics",
+        "gensyn",
+        "abbyy"
+      ]
+    },
+    "lever": {
+      "accounts": [
+        "octopus",
+        "emma-sleep",
+        "tinybird",
+        "frontify",
+        "viabill",
+        "zencore",
+        "tryjeeves",
+        "megaport",
+        "vivenu"
+      ]
+    },
+    "ashby": {
+      "job_boards": [
+        "1password",
+        "supabase",
+        "WunderGraph",
+        "everai",
+        "abacum",
+        "raiku",
+        "mazehq",
+        "resend",
+        "axiom-co",
+        "n8n",
+        "ashby",
+        "hopper",
+        "Coalesce"
+      ]
+    }
+  },
+  "state_path": ".state/jobhunt.sqlite",
+  "filters": {
+    "require_remote": true,
+    "remote_positive": [
+      "remote",
+      "fully remote",
+      "distributed",
+      "work from home",
+      "home based",
+      "remote (global)",
+      "work from anywhere",
+      "global remote"
+    ],
+    "remote_negative": [
+      "hybrid",
+      "on-site",
+      "onsite",
+      "in office",
+      "office-based",
+      "relocation required",
+      "remote (within",
+      "must be located in",
+      "must be based in",
+      "must reside in",
+      "only candidates located in",
+      "only within"
+    ],
+    "remote_anywhere_patterns": [
+      "work from anywhere",
+      "remote (global)",
+      "home based - worldwide",
+      "global remote",
+      "worldwide remote"
+    ],
+    "allowed_regions": [
+      "remote - europe",
+      "europe",
+      "emea",
+      "united kingdom",
+      "netherlands",
+      "belgium",
+      "germany",
+      "france",
+      "spain",
+      "portugal",
+      "italy",
+      "sweden",
+      "norway",
+      "denmark",
+      "finland",
+      "poland",
+      "czech",
+      "austria",
+      "switzerland",
+      "ireland"
+    ],
+    "blocked_regions": [
+      "us only",
+      "united states only",
+      "canada only",
+      "india only",
+      "singapore only",
+      "apac only",
+      "australia only",
+      "new zealand only"
+    ],
+    "title_allow_regex_any": [
+      "\\bsite reliability\\b|\\bsre\\b",
+      "\\breliability engineer\\b",
+      "\\bproduction engineer\\b",
+      "\\bplatform engineer(?:ing)?\\b",
+      "\\bdevops\\b",
+      "\\bcloud (?:engineer|infrastructure|platform|ops|operations)\\b",
+      "\\binfrastructure engineer\\b"
+    ],
+    "title_block_regex_any": [
+      "\\bdirector\\b|\\bvp\\b|\\bhead\\b|\\bmanager\\b",
+      "\\bstaff\\b|\\bprincipal\\b",
+      "\\barchitect\\b",
+      "\\bkernel\\b|\\blinux kernel\\b",
+      "\\bmachine learning\\b|\\bml\\b|\\bmlops\\b|\\bdata platform\\b",
+      "\\bsecurity operations\\b|\\bsecops\\b|\\bsoc\\b",
+      "\\bdata engineer\\b|\\banalytics\\b"
+    ],
+    "require_any_keywords": [
+      "azure",
+      "aks",
+      "azure devops",
+      "bicep",
+      "terraform",
+      "kubernetes",
+      "observability",
+      "opentelemetry",
+      "prometheus",
+      "grafana",
+      "slo",
+      "sli",
+      "error budget",
+      "incident",
+      "on-call",
+      "runbook"
+    ],
+    "include_keywords": {
+      "sre": 6,
+      "site reliability": 6,
+      "reliability": 3,
+      "slo": 4,
+      "sli": 4,
+      "error budget": 4,
+      "availability": 2,
+      "incident response": 3,
+      "runbook": 2,
+      "on-call": 2,
+      "pagerduty": 2,
+      "platform": 4,
+      "infrastructure": 3,
+      "devops": 3,
+      "cloud": 2,
+      "kubernetes": 4,
+      "k8s": 3,
+      "aks": 4,
+      "helm": 2,
+      "gitops": 2,
+      "argocd": 2,
+      "observability": 3,
+      "monitoring": 2,
+      "prometheus": 3,
+      "grafana": 2,
+      "opentelemetry": 2,
+      "terraform": 3,
+      "azure": 5,
+      "bicep": 5,
+      "azure devops": 3,
+      "ci/cd": 2,
+      "linux": 0
+    },
+    "title_bonus": {
+      "sre": 4,
+      "site reliability": 4,
+      "platform": 2,
+      "infrastructure": 1
+    },
+    "exclude_keywords": [
+      "intern",
+      "student",
+      "sales",
+      "account executive",
+      "business development",
+      "recruiter",
+      "recruitment",
+      "talent",
+      "marketing",
+      "customer success",
+      "support engineer",
+      "technical support"
+    ],
+    "min_score": 11
+  },
+  "alerts": {
+    "slack": { "enabled": true, "webhook_env": "SLACK_WEBHOOK_URL" }
+  },
+  "output": { "out_dir": "out" }
+}

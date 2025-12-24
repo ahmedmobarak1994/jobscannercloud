@@ -1,0 +1,62 @@
+name: Scan Jobs Daily
+
+on:
+  schedule:
+    # Run twice daily at 9:00 and 17:00 UTC (10:00 and 18:00 CET)
+    - cron: '0 9,17 * * *'
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Create state directory
+        run: |
+          mkdir -p .state
+
+      - name: Restore state from cache
+        uses: actions/cache@v4
+        with:
+          path: .state/
+          key: jobscanner-state-${{ github.run_id }}
+          restore-keys: |
+            jobscanner-state-
+
+      - name: Run job scan
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python3 jobhunt.py --config config.balanced.json scan
+
+      - name: Save state to cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .state/
+          key: jobscanner-state-${{ github.run_id }}
+
+      - name: Upload scan logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-logs-${{ github.run_number }}
+          path: |
+            out/*.log
+          retention-days: 7
+

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run jobhunt every 2 hours
+
+[Timer]
+OnBootSec=5m
+OnUnitActiveSec=2h
+Unit=jobhunt.service
+
+[Install]
+WantedBy=timers.target

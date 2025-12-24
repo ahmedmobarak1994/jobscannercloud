@@ -1,0 +1,43 @@
+{
+  "sources": {
+    "greenhouse": {
+      "boards": ["gitlab"]
+    }
+  },
+  "filters": {
+    "require_remote": false,
+    "remote_positive": ["remote"],
+    "remote_negative": [],
+    "remote_anywhere_patterns": [],
+    "allowed_regions": ["europe", "americas", "emea", "worldwide", "remote"],
+    "blocked_regions": [],
+    "title_allow_regex_any": [
+      "."
+    ],
+    "title_block_regex_any": [
+      "xxxxxxxxxx"
+    ],
+    "stack_groups": {
+      "any": ["remote", "engineer", "support", "gitlab", "customer", "software"]
+    },
+    "min_stack_groups": 1,
+    "include_keywords": {
+      "remote": 10,
+      "engineer": 5,
+      "support": 3
+    },
+    "title_bonus": {
+      "engineer": 10,
+      "support": 10
+    },
+    "min_score": 1
+  },
+  "alerts": {
+    "slack": {
+      "enabled": true,
+      "webhook_env": "SLACK_WEBHOOK_URL"
+    }
+  },
+  "state_path": ".state/jobhunt.sqlite"
+}
+

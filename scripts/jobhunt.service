@@ -1,0 +1,9 @@
+[Unit]
+Description=Remote SRE/Platform job scanner (Greenhouse)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/remote-sre-job-scanner
+EnvironmentFile=/opt/remote-sre-job-scanner/.env
+ExecStart=/opt/remote-sre-job-scanner/.venv/bin/python jobhunt.py --config config.json

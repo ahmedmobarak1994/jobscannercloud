@@ -1,0 +1,55 @@
+{
+  "sources": {
+    "greenhouse": {
+      "boards": ["gitlab", "hashicorp", "grafana"]
+    },
+    "lever": {
+      "accounts": ["octopus"]
+    },
+    "ashby": {
+      "job_boards": ["1password"]
+    }
+  },
+  "filters": {
+    "require_remote": true,
+    "remote_positive": ["remote", "distributed", "work from home"],
+    "remote_negative": ["hybrid", "on-site", "office only"],
+    "remote_anywhere_patterns": ["remote worldwide", "work from anywhere"],
+    "allowed_regions": ["europe", "eu", "emea", "worldwide", "global"],
+    "blocked_regions": ["usa only", "us only"],
+    "title_allow_regex_any": [
+      "sre", "site reliability", "devops", "platform engineer", "cloud infrastructure"
+    ],
+    "title_block_regex_any": [
+      "director", "head of", "vp of", "manager", "lead"
+    ],
+    "stack_groups": {
+      "role": ["sre", "site reliability", "devops", "platform", "infrastructure"],
+      "cloud": ["aws", "azure", "gcp", "kubernetes", "terraform", "docker"],
+      "observability": ["prometheus", "grafana", "datadog", "monitoring", "observability"]
+    },
+    "min_stack_groups": 2,
+    "include_keywords": {
+      "kubernetes": 10,
+      "terraform": 8,
+      "aws": 5,
+      "azure": 5,
+      "prometheus": 7,
+      "grafana": 7
+    },
+    "title_bonus": {
+      "sre": 15,
+      "site reliability": 15,
+      "platform": 10
+    },
+    "min_score": 15
+  },
+  "alerts": {
+    "slack": {
+      "enabled": true,
+      "webhook_env": "SLACK_WEBHOOK_URL"
+    }
+  },
+  "state_path": ".state/jobhunt.sqlite"
+}
+
