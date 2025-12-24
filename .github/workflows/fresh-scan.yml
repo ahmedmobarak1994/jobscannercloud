@@ -1,0 +1,51 @@
+name: Clear Cache and Fresh Scan
+
+on:
+  workflow_dispatch:
+
+jobs:
+  clear-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Clear all caches
+        run: |
+          echo "🗑️  Forcing fresh scan - no state restoration"
+          mkdir -p .state
+
+      - name: Debug environment
+        run: |
+          echo "🔍 Checking Slack webhook..."
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            echo "✅ Slack webhook SECRET exists"
+          else
+            echo "❌ Slack webhook NOT set!"
+          fi
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Run FRESH scan
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          echo "🚀 Running fresh scan with NO cache..."
+          python3 jobhunt.py --config config.balanced.json scan
+
+      - name: Save new state
+        uses: actions/cache/save@v4
+        with:
+          path: .state/
+          key: jobscanner-state-fresh-${{ github.run_number }}
+
