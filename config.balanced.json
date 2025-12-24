@@ -259,7 +259,10 @@
       "solutions architect",
       "cloud support",
       "junior cloud",
-      "\\bmanager\\b"
+      "\\bmanager\\b",
+      "\\bdesigner\\b",
+      "ux designer",
+      "ui designer"
     ],
     "stack_groups": {
       "role": [
