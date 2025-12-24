@@ -11,11 +11,12 @@
       <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/.venv/bin/python</string>
       <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/jobhunt.py</string>
       <string>--config</string>
-      <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/config.json</string>
+      <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner/config.balanced.json</string>
+      <string>scan</string>
     </array>
 
     <key>StartInterval</key>
-    <integer>7200</integer> <!-- 2 hours -->
+    <integer>21600</integer> <!-- 6 hours (4x/day) -->
 
     <key>WorkingDirectory</key>
     <string>/ABSOLUTE/PATH/TO/remote-sre-job-scanner</string>

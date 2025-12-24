@@ -3,6 +3,8 @@ Main job scanner orchestration
 """
 from typing import List, Dict, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+from datetime import datetime
 from .sources import SOURCE_REGISTRY
 from .models import Job
 from .filtering import JobFilter
@@ -38,6 +40,10 @@ class JobScanner:
 
         # Source health tracking
         self.source_health = SourceHealth()
+
+        # Explore mode output
+        self.explore_mode = filter_config.get('explore_mode', False)
+        self.explore_jobs = []  # Collect all passed jobs for explore output
 
         self.stats = {
             "sources_scanned": 0,
@@ -125,6 +131,10 @@ class JobScanner:
             if result.passed:
                 self.stats['jobs_passed'] += 1
 
+                # Store for explore mode
+                if self.explore_mode:
+                    self.explore_jobs.append((job, result))
+
                 should_alert, is_new = self._check_should_alert(job)
 
                 if should_alert:
@@ -148,6 +158,10 @@ class JobScanner:
         if not self.dry_run and self.slack and alerts:
             print(f"\n📢 Sending {len(alerts)} alerts to Slack...")
             self._send_alerts(alerts)
+
+        # Generate explore output
+        if self.explore_mode and self.explore_jobs:
+            self._write_explore_output()
 
         # Summary
         self._print_summary()
@@ -214,4 +228,55 @@ class JobScanner:
                 print(f"    PERM_FAIL:       {health_stats['PERM_FAIL']}")
 
         print(f"{'='*60}\n")
+
+    def _write_explore_output(self):
+        """Write explore mode output to markdown file"""
+        from pathlib import Path
+
+        output_dir = Path("out")
+        output_dir.mkdir(exist_ok=True)
+
+        output_file = output_dir / "explore.md"
+
+        # Sort by score (descending)
+        sorted_jobs = sorted(self.explore_jobs, key=lambda x: x[1].score, reverse=True)
+
+        # Take top 50
+        top_jobs = sorted_jobs[:50]
+
+        with open(output_file, 'w') as f:
+            f.write(f"# Job Scanner Explore Mode\n\n")
+            f.write(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n")
+            f.write(f"**Stats:**\n")
+            f.write(f"- Jobs scanned: {self.stats['jobs_fetched']}\n")
+            f.write(f"- Jobs passed: {self.stats['jobs_passed']}\n")
+            f.write(f"- Showing top: {len(top_jobs)}\n\n")
+            f.write("---\n\n")
+
+            for i, (job, result) in enumerate(top_jobs, 1):
+                f.write(f"## {i}. {job.title}\n\n")
+                f.write(f"**Company:** {job.company} ({job.source})\n\n")
+                f.write(f"**Location:** {job.location}\n\n")
+                f.write(f"**Score:** {result.score}\n\n")
+
+                # Show scoring breakdown
+                if result.scoring_breakdown:
+                    f.write(f"**Score Breakdown:**\n")
+                    for category, points in result.scoring_breakdown.items():
+                        f.write(f"- {category}: +{points}\n")
+                    f.write("\n")
+
+                # Show matched keywords
+                if result.keyword_matches:
+                    f.write(f"**Matched Keywords:**\n")
+                    for category, keywords in result.keyword_matches.items():
+                        if keywords:
+                            f.write(f"- {category}: {', '.join(keywords)}\n")
+                    f.write("\n")
+
+                f.write(f"**URL:** {job.url}\n\n")
+                f.write("---\n\n")
+
+        print(f"\n📝 Explore output written to: {output_file}")
+        print(f"   Top {len(top_jobs)} jobs saved for review")
 
