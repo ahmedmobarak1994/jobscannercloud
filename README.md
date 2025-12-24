@@ -1,18 +1,17 @@
 # Remote SRE Job Scanner
 
-Automated job scanner voor SRE/Platform/DevOps/Cloud Engineering vacatures met focus op remote EMEA posities.
+Automated job scanner for SRE/Platform/DevOps/Cloud Engineering roles with **strict EU/EMEA geo-filtering**.
 
-## Features
+## 🎯 What It Does
 
-- 🌍 **Multi-ATS Support**: Greenhouse, Lever, Ashby
-- 🎯 **Smart Filtering**: Multi-stage gates (remote, region, title, stack, scoring)
-- 🔍 **110+ Tech Companies**: GitLab, HashiCorp, Stripe, DataDog, Cloudflare, etc.
-- 📊 **Explainability**: Zie waarom jobs wel/niet matchen
-- 💾 **State Management**: SQLite dedupe + re-alerts op updates
-- 📢 **Slack Alerts**: Real-time notificaties
-- 🤖 **GitHub Actions**: Automatisch dagelijks scannen
+- Scans 110+ tech companies via ATS APIs (Greenhouse, Lever, Ashby)
+- **Strict geo-filtering**: Only EU/EMEA or worldwide remote (blocks US/Canada/Australia, blocks single-country residency-restricted remote)
+- **Role filtering**: Only SRE/Platform/DevOps/Infrastructure engineers (blocks PM/architect/support/data/ML)
+- **Smart deduplication**: SQLite state tracking, only alerts on new/updated jobs
+- **Slack integration**: Real-time alerts with scoring and reasons
+- **GitHub Actions**: Automated scans 2x per day
 
-## Quick Start
+## 🚀 Quick Start
 
 ### 1. Install Dependencies
 
@@ -22,139 +21,247 @@ pip install -r requirements.txt
 
 ### 2. Configure Slack
 
-Maak een `.env` file:
+Create `.env` file:
 
 ```bash
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 ```
 
-### 3. Run Scan
+### 3. Run
 
 ```bash
 # Test Slack
 python3 jobhunt.py test-slack
 
-# Dry run (geen alerts)
-python3 jobhunt.py --config config.balanced.json scan --dry-run
+# Dry run (no alerts)
+python3 jobhunt.py scan --dry-run
 
-# Live scan
-python3 jobhunt.py --config config.balanced.json scan
-```
-
-## Configuration
-
-### Config Profiles
-
-- **`config.balanced.json`** - Aanbevolen: breed maar gefocust (110+ bedrijven, min_score: 8)
-- **`config.production.json`** - Strict SRE focus (min_score: 18, 2 stack groups)
-- **`config.test.json`** - Testing purposes
-
-### Filters
-
-#### Remote & Region
-- ✅ Remote-first/fully remote/distributed
-- ✅ EMEA/EU/Europe/Worldwide
-- ❌ Hybrid/on-site
-- ❌ "USA only"/"Canada only"
-
-#### Titles
-- ✅ SRE, Platform Engineer, DevOps, Cloud Engineer, Infrastructure Engineer
-- ❌ Director, Manager, Frontend, AI Engineer, Data Scientist
-
-#### Stack Groups (min 1 of 3)
-- **Role**: SRE, reliability, devops, platform, infrastructure
-- **Cloud**: AWS, Azure, GCP, Kubernetes, Terraform, Docker
-- **Observability**: Prometheus, Grafana, monitoring, incident, on-call, SLO
-
-#### Scoring
-- Keywords: kubernetes (15), terraform (12), AWS/Azure/GCP (8), SRE (20)
-- Title bonus: SRE (25), Platform (20), DevOps (15)
-- Min score: 8 (balanced) / 12 (strict) / 18 (very strict)
-
-## CLI Commands
-
-```bash
-# Scan
+# Live scan with alerts
 python3 jobhunt.py scan
-python3 jobhunt.py --config config.balanced.json scan --dry-run
-python3 jobhunt.py scan --explain  # Show filtering details
-python3 jobhunt.py scan --print-all  # Show all jobs (incl rejected)
 
-# Test Slack
-python3 jobhunt.py test-slack
+# Fresh scan (clear state)
+./test_fresh_scan.sh
 ```
 
-## Architecture
+## ⚙️ Configuration
+
+### Main Config: `config.balanced.json`
+
+This is the **production config** used by GitHub Actions.
+
+**Key settings:**
+
+- **110+ companies**: GitLab, Stripe, Datadog, Cloudflare, Dropbox, Canonical, JetBrains, Monzo, etc.
+- **Geo policy**: Strict EU/EMEA or worldwide only
+- **Title filters**: SRE/Platform/DevOps/Infrastructure only
+- **Min score**: 8 (balanced quality vs volume)
+
+### Alternative Config: `config.production.json`
+
+Stricter version with:
+- Min score: 18 (fewer but higher quality matches)
+- Requires 2 of 3 stack groups
+- More restrictive keywords
+
+### Test Config: `config.test.json`
+
+For testing - very permissive filters.
+
+## 🌍 Geo-Filtering Policy
+
+See [LOCATION_POLICY.md](LOCATION_POLICY.md) for details.
+
+**TLDR:**
+
+✅ **ALLOW:**
+- "Remote, EMEA"
+- "Remote - Europe"
+- "Home based - Worldwide"
+- "Remote - EU"
+
+❌ **BLOCK:**
+- "Remote - USA/Canada/Australia"
+- "Remote - Poland" (single-country = residency restricted)
+- "Remote (UK)" (single-country = residency restricted)
+- "Toronto, Remote in Canada"
+- "Remote (Seattle, WA only)"
+
+**Why?** Single-country remote usually means you must live in that country (payroll/legal). Only broad regional (EMEA) or worldwide remote is allowed.
+
+## 🎯 Role Filtering
+
+**ALLOW:**
+- Site Reliability Engineer
+- Platform Engineer
+- DevOps Engineer
+- Infrastructure Engineer
+- Cloud Infrastructure Engineer
+- Production Engineer
+
+**BLOCK:**
+- Architect, Manager, Director
+- Product Manager, Program Manager
+- Support Engineer, Field Engineer, Solutions Architect
+- Security Engineer (security-only track)
+- Data Engineer, Data Infrastructure
+- ML/AI Platform Engineer
+- Designer, UX/UI
+
+## 📊 Typical Results
+
+**Volume:** ~3-5 relevant matches per scan from 6000+ jobs
+
+**Example matches:**
+- GitLab - Intermediate SRE (Remote, EMEA)
+- Canonical - Senior SRE (Home based - Worldwide)
+- Platform Engineer roles at EU companies
+
+## 🤖 GitHub Actions
+
+Automated scans run **2x per day** (9:00 and 17:00 UTC).
+
+**Workflows:**
+
+1. **`scan-jobs.yml`** - Regular scheduled scans
+2. **`fresh-scan.yml`** - Manual trigger with cache clear
+
+**Setup:**
+
+1. Add GitHub Secret: `SLACK_WEBHOOK_URL`
+2. Go to Actions tab → Enable workflows
+3. Trigger manually or wait for scheduled run
+
+See [GITHUB_SETUP.md](GITHUB_SETUP.md) for details.
+
+## 🧪 Testing
+
+```bash
+# Test location parser
+python3 test_location_parser.py
+
+# Fresh scan (clears state)
+./test_fresh_scan.sh
+
+# Dry run with explanations
+python3 jobhunt.py scan --dry-run --explain
+```
+
+## 📁 Project Structure
 
 ```
-src/
-├── models.py          # Job + SourceHealth models
-├── config.py          # Config loading
-├── state.py           # SQLite state management
-├── filtering.py       # Multi-stage filtering + scoring
-├── scanner.py         # Main orchestration
-├── alerting.py        # Slack integration
-└── sources/
-    ├── base.py        # Abstract source plugin
-    ├── greenhouse.py  # Greenhouse API
-    ├── lever.py       # Lever API
-    └── ashby.py       # Ashby API
+.
+├── jobhunt.py              # CLI entry point
+├── requirements.txt        # Python dependencies
+├── config.balanced.json    # Main production config
+├── config.production.json  # Strict alternative
+├── config.test.json        # Test config
+├── src/
+│   ├── config.py          # Config loading
+│   ├── models.py          # Job data models
+│   ├── state.py           # SQLite state management
+│   ├── filtering.py       # Multi-stage filtering
+│   ├── location_parser.py # Geo-filtering logic
+│   ├── scanner.py         # Main orchestration
+│   ├── alerting.py        # Slack integration
+│   └── sources/           # ATS integrations
+│       ├── greenhouse.py
+│       ├── lever.py
+│       └── ashby.py
+├── .github/workflows/     # GitHub Actions
+├── test_fresh_scan.sh     # Fresh scan script
+└── test_location_parser.py # Location parser tests
 ```
 
-## GitHub Actions
+## 🔧 Tuning
 
-Automatic daily scans at 9:00 and 17:00 UTC:
+### Get More Volume
 
-```yaml
-# .github/workflows/scan-jobs.yml
-- Runs: 2x per day
-- Alerts: Direct to Slack
-- State: Persisted between runs
+Lower `min_score` in config:
+
+```json
+"min_score": 8  // default
+"min_score": 5  // more volume
 ```
 
-## Adding Companies
+### Get Higher Quality
+
+Increase `min_score`:
+
+```json
+"min_score": 15  // only top matches
+```
+
+### Add More Companies
 
 Edit `config.balanced.json`:
 
 ```json
-{
-  "sources": {
-    "greenhouse": {
-      "boards": ["company-slug"]
-    },
-    "lever": {
-      "accounts": ["company-slug"]
-    },
-    "ashby": {
-      "job_boards": ["CompanySlug"]
-    }
+"sources": {
+  "greenhouse": {
+    "boards": ["company-slug", ...]
   }
 }
 ```
 
-Find slugs:
+Find slugs from job board URLs:
 - Greenhouse: `boards.greenhouse.io/{slug}`
 - Lever: `jobs.lever.co/{slug}`
 - Ashby: `jobs.ashbyhq.com/{slug}`
 
-## Stats
+### Adjust Geo Policy
 
-Last run (Example):
-- 111 companies scanned
-- 6227 jobs analyzed
-- 58 relevant matches (0.93% hit rate)
-- Focus: Cloud/Platform/SRE/DevOps roles
-- Regions: EMEA/EU/Worldwide
+Edit `filters.geo` in config:
 
-## Top Companies
+```json
+"geo": {
+  "allow_worldwide_remote": true,  // allow "work from anywhere"
+  "blocked_countries": [...]       // countries to block
+}
+```
 
-GitLab, HashiCorp, Grafana, DataDog, Elastic, Stripe, Cloudflare, MongoDB, Coinbase, Databricks, JetBrains, Monzo, Adyen, Doctolib, Twilio, PagerDuty, Redis, Postman, Algolia, CircleCI, LaunchDarkly, Amplitude, Fivetran, +90 more
+## 📚 Documentation
 
-## License
+- [LOCATION_POLICY.md](LOCATION_POLICY.md) - Geo-filtering logic and test cases
+- [GEO_FILTERING.md](GEO_FILTERING.md) - Technical details of geo-filtering
+- [GITHUB_SETUP.md](GITHUB_SETUP.md) - GitHub Actions setup
+
+## 🐛 Debugging
+
+```bash
+# See why jobs are rejected
+python3 jobhunt.py scan --dry-run --print-all
+
+# See geo-filtering reasons
+python3 jobhunt.py scan --dry-run --explain | grep "Geo:"
+
+# Check filter stats
+python3 jobhunt.py scan --dry-run
+```
+
+## 📈 Stats
+
+Last production scan:
+- Companies scanned: 111
+- Jobs fetched: 6,200+
+- Jobs passed filters: 3-5
+- Hit rate: ~0.05% (extremely selective)
+- Alerts sent: New/updated only
+
+## 🎯 Success Criteria
+
+You know it's working when you get:
+
+✅ Only EU/EMEA or worldwide remote jobs
+✅ Only SRE/Platform/DevOps/Infrastructure roles
+✅ No US/Canada/Australia spam
+✅ No Product Manager/Architect/Support roles
+✅ No single-country residency-restricted remote
+
+## 🤝 Contributing
+
+Add more companies, improve filters, or add new ATS sources via PR!
+
+## 📄 License
 
 MIT
-
-## Contributing
-
-PRs welcome! Add more companies, improve filters, or add new ATS sources.
 

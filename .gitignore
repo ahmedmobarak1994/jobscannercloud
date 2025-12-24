@@ -37,5 +37,13 @@ Thumbs.db
 
 # Test files
 test_*.py
-*_test.py
+
+# Node/Frontend (if accidentally added)
+node_modules/
+package-lock.json
+.prettierrc
+
+# Generated configs
+config.merged.json
+discovered.sources.json
 

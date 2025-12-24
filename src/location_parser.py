@@ -122,7 +122,16 @@ class LocationParser:
     ]
 
     # Worldwide patterns
-    WORLDWIDE_PATTERNS = ['worldwide', 'work from anywhere', 'global remote', 'remote worldwide']
+    WORLDWIDE_PATTERNS = [
+        'worldwide',
+        'work from anywhere',
+        'global remote',
+        'remote worldwide',
+        'home based - worldwide',
+        'home based worldwide',
+        'remote (global)',
+        'remote global'
+    ]
 
     def parse_location(self, raw: str, content: str = "") -> LocationInfo:
         """
@@ -294,56 +303,49 @@ class GeoFilter:
 
         # Remote restricted (US state, specific cities, "only" patterns)
         if loc.scope == LocationScope.REMOTE_RESTRICTED:
-            # Check if restriction is in allowed regions
-            if loc.countries:
-                if any(c in self.eu_countries for c in loc.countries):
-                    return True, f"restricted but EU country: {loc.countries}", loc
-                if any(c in self.blocked_countries for c in loc.countries):
-                    return False, f"restricted to blocked country: {loc.countries}", loc
+            return False, "location restriction detected (city/state/only pattern)", loc
 
-            if loc.has_us_state:
-                return False, "restricted to US state/city", loc
-
-            if loc.has_city_restriction:
-                return False, "restricted to specific cities", loc
-
-            # Unknown restriction - be safe and block
-            return False, "location restriction detected", loc
-
-        # Remote country-specific
+        # Remote country-specific (STRICT: most single-country remote = residency requirement!)
         if loc.scope == LocationScope.REMOTE_COUNTRY:
             # Block if any blocked country
             if any(c in self.blocked_countries for c in loc.countries):
                 return False, f"blocked country: {loc.countries}", loc
 
-            # Allow if any EU country
+            # CRITICAL: Single country (e.g., "Remote - Poland") usually means residency required
+            # Only allow if it's in a small whitelist OR if location explicitly says "EMEA/EU"
+            if len(loc.countries) == 1:
+                single_country = list(loc.countries)[0]
+
+                # Check if location text ALSO mentions EMEA/EU/Europe (then it's broad)
+                location_lower = raw_location.lower()
+                if any(r in location_lower for r in ['emea', 'europe', 'european', ' eu ']):
+                    return True, f"EU country + EMEA/EU context: {single_country}", loc
+
+                # Otherwise: single-country remote = likely residency requirement = BLOCK
+                return False, f"single-country remote (residency likely required): {single_country}", loc
+
+            # Multiple EU countries = probably OK
             if any(c in self.eu_countries for c in loc.countries):
-                return True, f"EU country: {loc.countries}", loc
+                return True, f"multi-country EU remote: {loc.countries}", loc
 
-            # Allow if country in allowed_regions (backwards compat)
-            if any(c in self.allowed_regions for c in loc.countries):
-                return True, f"allowed country: {loc.countries}", loc
+            # Unknown multi-country - block by default
+            return False, f"unknown countries: {loc.countries}", loc
 
-            # Unknown country - block by default (strict)
-            return False, f"unknown/unallowed country: {loc.countries}", loc
-
-        # Remote region
+        # Remote region (EMEA, Europe, EU) - ALLOW
         if loc.scope == LocationScope.REMOTE_REGION:
             if any(r in self.allowed_regions for r in loc.regions):
                 return True, f"allowed region: {loc.regions}", loc
             return False, f"region not allowed: {loc.regions}", loc
 
-        # Remote global/worldwide
+        # Remote global/worldwide - ALLOW (this is true WFA)
         if loc.scope == LocationScope.REMOTE_GLOBAL:
             if self.allow_worldwide_remote:
-                return True, "worldwide remote (allowed by policy)", loc
+                return True, "worldwide remote (work from anywhere)", loc
             return False, "worldwide remote (blocked by policy)", loc
 
-        # Remote unknown (just says "Remote" with no region/country)
+        # Remote unknown (just says "Remote") - BLOCK (be strict!)
         if loc.scope == LocationScope.REMOTE_UNKNOWN:
-            if self.allow_unknown_remote:
-                return True, "unknown remote location (allowed by policy)", loc
-            return False, "unknown remote location (blocked by policy - be explicit!)", loc
+            return False, "ambiguous remote (no region specified)", loc
 
         # Fallback
         return False, f"unhandled scope: {loc.scope}", loc

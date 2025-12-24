@@ -159,7 +159,7 @@
         "australia",
         "new zealand"
       ],
-      "allow_worldwide_remote": false,
+      "allow_worldwide_remote": true,
       "allow_unknown_remote": false
     },
     "require_remote": true,
@@ -243,7 +243,11 @@
       "frontend engineer",
       "\\bai engineer\\b",
       "machine learning engineer",
+      "machine learning platform",
+      "ml platform",
       "data scientist",
+      "data engineer",
+      "data infrastructure",
       "product manager",
       "program manager",
       "tpm",
@@ -262,7 +266,19 @@
       "\\bmanager\\b",
       "\\bdesigner\\b",
       "ux designer",
-      "ui designer"
+      "ui designer",
+      "\\barchitect\\b",
+      "software architect",
+      "security engineer",
+      "security architect",
+      "\\bsecurity\\b",
+      "project maintainer",
+      "\\bmaintainer\\b",
+      "\\bkafka\\b",
+      "opensearch",
+      "elasticsearch",
+      "ai assistant",
+      "ai infrastructure"
     ],
     "stack_groups": {
       "role": [
