@@ -1,0 +1,26 @@
+{
+  "discovered": {
+    "greenhouse": [
+      "sourcegraph91"
+    ],
+    "lever": [
+      "voxy"
+    ],
+    "ashby": []
+  },
+  "validated": {
+    "greenhouse": [
+      {
+        "slug": "sourcegraph91",
+        "jobs": 4
+      }
+    ],
+    "lever": [
+      {
+        "slug": "voxy",
+        "jobs": 4
+      }
+    ],
+    "ashby": []
+  }
+}

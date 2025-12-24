@@ -48,6 +48,12 @@ class Config:
 
     def get_slack_webhook(self) -> Optional[str]:
         """Get Slack webhook URL"""
+        # Try environment variable first (for GitHub Actions)
+        webhook = os.getenv("SLACK_WEBHOOK_URL")
+        if webhook:
+            return webhook
+
+        # Fallback to config
         alerts = self.config.get("alerts", {})
         slack_config = alerts.get("slack", {})
 

@@ -42,6 +42,12 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          echo "🔍 Checking Slack webhook..."
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            echo "✅ Slack webhook is configured"
+          else
+            echo "❌ Slack webhook is NOT set!"
+          fi
           python3 jobhunt.py --config config.balanced.json scan
 
       - name: Save state to cache
