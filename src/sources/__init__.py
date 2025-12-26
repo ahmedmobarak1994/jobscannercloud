@@ -6,6 +6,8 @@ from .remotive import RemotiveSource
 from .weworkremotely import WeWorkRemotelySource
 from .adzuna import AdzunaSource
 from .remoteok import RemoteOKSource
+from .recruitee import RecruiteeSource
+from .workable import WorkableSource
 
 SOURCE_REGISTRY = {
     "greenhouse": GreenhouseSource,
@@ -15,6 +17,8 @@ SOURCE_REGISTRY = {
     "weworkremotely": WeWorkRemotelySource,
     "adzuna": AdzunaSource,
     "remoteok": RemoteOKSource,
+    "recruitee": RecruiteeSource,
+    "workable": WorkableSource,
 }
 
 __all__ = ['SOURCE_REGISTRY']

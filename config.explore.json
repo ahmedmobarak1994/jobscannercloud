@@ -134,6 +134,25 @@
     },
     "remoteok": {
       "feeds": ["all"]
+    },
+    "recruitee": {
+      "companies": [
+        "payter",
+        "adyen",
+        "mollie",
+        "messagebird",
+        "booking",
+        "picnic-technologies",
+        "miro",
+        "sendcloud"
+      ]
+    },
+    "workable": {
+      "accounts": [
+        "inventyou-ab",
+        "candoris",
+        "lalaland"
+      ]
     }
   },
   "filters": {
