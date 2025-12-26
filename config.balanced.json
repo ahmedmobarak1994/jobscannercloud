@@ -142,6 +142,12 @@
         "programming",
         "devops"
       ]
+    },
+    "adzuna": {
+      "queries": [
+        "nl:devops:1",
+        "nl:platform engineer:1"
+      ]
     }
   },
   "filters": {

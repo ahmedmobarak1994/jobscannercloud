@@ -68,19 +68,20 @@ class AdzunaSource(BaseSource):
             query = parts[1] if len(parts) > 1 else ''
             page = parts[2] if len(parts) > 2 else '1'
 
-            # Build URL and params
-            url = self.build_url(identifier)
+            # Build URL
+            url = f"{self.BASE_URL}/{country}/search/{page}"
+
+            # Build params
             params = {
                 'app_id': self.app_id,
                 'app_key': self.app_key,
                 'results_per_page': limit or 50,
                 'what': query,
-                'where': 'netherlands',
-                'content-type': 'application/json'
+                'where': 'netherlands'
             }
 
-            # Fetch with retry
-            response = self._fetch_with_retry(url + '?' + '&'.join(f'{k}={v}' for k, v in params.items()))
+            # Fetch with proper GET request
+            response = requests.get(url, params=params, timeout=self.timeout)
             response.raise_for_status()
 
             # Validate structure

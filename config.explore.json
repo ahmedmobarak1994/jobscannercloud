@@ -135,6 +135,14 @@
     "remoteok": {
       "feeds": ["all"]
     },
+    "adzuna": {
+      "queries": [
+        "nl:devops:1",
+        "nl:platform engineer:1",
+        "nl:sre:1",
+        "nl:cloud engineer:1"
+      ]
+    },
     "recruitee": {
       "companies": [
         "payter",
