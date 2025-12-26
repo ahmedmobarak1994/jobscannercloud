@@ -67,22 +67,23 @@ jobs:
           if [ -n "${{ secrets.ADZUNA_APP_ID }}" ]; then
             echo "✅ ADZUNA_APP_ID SECRET exists in GitHub"
           else
-            echo "❌ ADZUNA_APP_ID SECRET is NOT set in GitHub!"
-            echo "   Adzuna scanner will not work!"
+            echo "⚠️  ADZUNA_APP_ID SECRET is NOT set in GitHub"
+            echo "   Adzuna sources will be skipped"
           fi
           if [ -n "${{ secrets.ADZUNA_APP_KEY }}" ]; then
             echo "✅ ADZUNA_APP_KEY SECRET exists in GitHub"
           else
-            echo "❌ ADZUNA_APP_KEY SECRET is NOT set in GitHub!"
-            echo "   Adzuna scanner will not work!"
+            echo "⚠️  ADZUNA_APP_KEY SECRET is NOT set in GitHub"
+            echo "   Adzuna sources will be skipped"
           fi
           
           if [ -z "${{ secrets.ADZUNA_APP_ID }}" ] || [ -z "${{ secrets.ADZUNA_APP_KEY }}" ]; then
             echo ""
-            echo "⚠️  To fix: Add secrets at:"
+            echo "ℹ️  Optional: To enable Adzuna job search, add secrets at:"
             echo "   https://github.com/${{ github.repository }}/settings/secrets/actions"
             echo "   1. ADZUNA_APP_ID"
             echo "   2. ADZUNA_APP_KEY"
+            echo "   Get free API key: https://developer.adzuna.com/signup"
           fi
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

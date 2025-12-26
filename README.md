@@ -39,7 +39,7 @@ ADZUNA_APP_ID=your_app_id_here
 ADZUNA_APP_KEY=your_app_key_here
 ```
 
-**For GitHub Actions**: Add these as [repository secrets](https://github.com/ahmedmobarak1994/jobscannercloud/settings/secrets/actions):
+**For GitHub Actions**: Add these as repository secrets (Settings → Secrets and variables → Actions):
 - `ADZUNA_APP_ID`
 - `ADZUNA_APP_KEY`
 
