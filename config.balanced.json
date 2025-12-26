@@ -131,6 +131,17 @@
         "linear",
         "anthropic"
       ]
+    },
+    "remotive": {
+      "categories": [
+        "software-dev"
+      ]
+    },
+    "weworkremotely": {
+      "categories": [
+        "programming",
+        "devops"
+      ]
     }
   },
   "filters": {
