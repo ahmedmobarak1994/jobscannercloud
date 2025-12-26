@@ -15,32 +15,51 @@ class RemotiveSource(BaseSource):
 
     BASE_URL = "https://remotive.com/api/remote-jobs"
 
-    def fetch_jobs(self, category: str = "software-dev") -> List[Job]:
+    def get_source_name(self) -> str:
+        """Return source name"""
+        return "remotive"
+
+    def build_url(self, identifier: str) -> str:
+        """Build API URL"""
+        return f"{self.BASE_URL}?category={identifier}"
+
+    def _validate_response_structure(self, response: requests.Response):
+        """Validate response has expected structure"""
+        data = response.json()
+        if not isinstance(data, dict):
+            raise ValueError("Response is not a dict")
+        if 'jobs' not in data:
+            raise ValueError("Response missing 'jobs' key")
+        if not isinstance(data['jobs'], list):
+            raise ValueError("'jobs' is not a list")
+
+    def fetch_jobs(self, identifier: str, limit: int = None) -> List[Job]:
         """
         Fetch jobs from Remotive
 
         Args:
-            category: Job category (default: software-dev)
+            identifier: Job category (e.g., "software-dev")
+            limit: Not used (API returns all)
 
         Returns:
             List of Job objects
         """
         try:
-            # Build URL
-            url = self.BASE_URL
-            params = {"category": category} if category else {}
-
-            # Fetch with timeout
-            response = requests.get(url, params=params, timeout=10)
+            # Build URL and fetch
+            url = self.build_url(identifier)
+            response = self._fetch_with_retry(url)
             response.raise_for_status()
+
+            # Validate structure
+            self._validate_response_structure(response)
 
             data = response.json()
             jobs = []
 
             # Parse jobs
             for job_data in data.get('jobs', []):
-                # Skip if expired
-                if job_data.get('publication_date') is None:
+                # Skip if no publication date (likely expired)
+                if not job_data.get('publication_date'):
                     continue
 
                 # Create Job object
@@ -66,7 +85,6 @@ class RemotiveSource(BaseSource):
 
     def _extract_text(self, html: str) -> str:
         """Extract plain text from HTML description"""
-        # Simple HTML strip (can be improved with BeautifulSoup if needed)
         import re
         text = re.sub(r'<[^>]+>', ' ', html)
         text = re.sub(r'\s+', ' ', text)

@@ -131,6 +131,9 @@
         "linear",
         "anthropic"
       ]
+    },
+    "remoteok": {
+      "feeds": ["all"]
     }
   },
   "filters": {
