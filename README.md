@@ -19,7 +19,7 @@ Automated job scanner for SRE/Platform/DevOps/Cloud Engineering roles with **str
 pip install -r requirements.txt
 ```
 
-### 2. Configure Slack
+### 2. Configure Slack (Optional)
 
 Create `.env` file:
 
@@ -27,7 +27,25 @@ Create `.env` file:
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 ```
 
-### 3. Run
+### 3. Configure Adzuna (Optional)
+
+Adzuna is a job search engine that provides additional job coverage, especially for the Netherlands market.
+
+1. Sign up for free API credentials at https://developer.adzuna.com/signup
+2. Add to your `.env` file:
+
+```bash
+ADZUNA_APP_ID=your_app_id_here
+ADZUNA_APP_KEY=your_app_key_here
+```
+
+**For GitHub Actions**: Add these as [repository secrets](https://github.com/ahmedmobarak1994/jobscannercloud/settings/secrets/actions):
+- `ADZUNA_APP_ID`
+- `ADZUNA_APP_KEY`
+
+Note: If not configured, Adzuna sources will be skipped automatically.
+
+### 4. Run
 
 ```bash
 # Test Slack

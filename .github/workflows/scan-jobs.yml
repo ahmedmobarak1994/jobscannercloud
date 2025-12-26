@@ -61,12 +61,37 @@ jobs:
             echo "❌ Slack webhook SECRET is NOT set in GitHub!"
             echo "   Go to: https://github.com/${{ github.repository }}/settings/secrets/actions"
           fi
+          
+          echo ""
+          echo "🔍 Checking Adzuna credentials..."
+          if [ -n "${{ secrets.ADZUNA_APP_ID }}" ]; then
+            echo "✅ ADZUNA_APP_ID SECRET exists in GitHub"
+          else
+            echo "❌ ADZUNA_APP_ID SECRET is NOT set in GitHub!"
+            echo "   Adzuna scanner will not work!"
+          fi
+          if [ -n "${{ secrets.ADZUNA_APP_KEY }}" ]; then
+            echo "✅ ADZUNA_APP_KEY SECRET exists in GitHub"
+          else
+            echo "❌ ADZUNA_APP_KEY SECRET is NOT set in GitHub!"
+            echo "   Adzuna scanner will not work!"
+          fi
+          
+          if [ -z "${{ secrets.ADZUNA_APP_ID }}" ] || [ -z "${{ secrets.ADZUNA_APP_KEY }}" ]; then
+            echo ""
+            echo "⚠️  To fix: Add secrets at:"
+            echo "   https://github.com/${{ github.repository }}/settings/secrets/actions"
+            echo "   1. ADZUNA_APP_ID"
+            echo "   2. ADZUNA_APP_KEY"
+          fi
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Run job scan
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
         run: |
           python3 jobhunt.py --config config.balanced.json scan
 
