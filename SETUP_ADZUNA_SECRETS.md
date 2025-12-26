@@ -6,19 +6,22 @@ The GitHub Actions workflows have been updated to support Adzuna scanner credent
 
 ## 🔑 Required GitHub Secrets
 
-According to your documentation (`ADZUNA_GITHUB_SECRETS.md`), you need to add these two secrets:
+You need to add these two secrets to GitHub Actions:
 
-1. **ADZUNA_APP_ID**: `eefa3bf0`
-2. **ADZUNA_APP_KEY**: `d8f65cb6ece4e2f3bb8c5ff1b6b09cf1`
+1. **ADZUNA_APP_ID**: Your Adzuna application ID
+2. **ADZUNA_APP_KEY**: Your Adzuna API key
+
+> **Note**: If you need the specific credential values for this repository, check the existing file `ADZUNA_GITHUB_SECRETS.md` or retrieve them from https://developer.adzuna.com/ dashboard.
 
 ## 📝 How to Add GitHub Secrets
 
 ### Step 1: Go to Repository Settings
 
-Visit: https://github.com/ahmedmobarak1994/jobscannercloud/settings/secrets/actions
+Visit your repository's secrets page:
+`https://github.com/YOUR_USERNAME/YOUR_REPO/settings/secrets/actions`
 
 Or manually:
-1. Go to your repository: https://github.com/ahmedmobarak1994/jobscannercloud
+1. Go to your repository on GitHub
 2. Click **Settings** (top menu bar)
 3. Click **Secrets and variables** → **Actions** (left sidebar)
 
@@ -27,7 +30,7 @@ Or manually:
 1. Click **New repository secret** (green button)
 2. Fill in:
    - **Name**: `ADZUNA_APP_ID`
-   - **Secret**: `eefa3bf0`
+   - **Secret**: `[your_adzuna_app_id]`
 3. Click **Add secret**
 
 ### Step 3: Add Second Secret (ADZUNA_APP_KEY)
@@ -35,7 +38,7 @@ Or manually:
 1. Click **New repository secret** again
 2. Fill in:
    - **Name**: `ADZUNA_APP_KEY`
-   - **Secret**: `d8f65cb6ece4e2f3bb8c5ff1b6b09cf1`
+   - **Secret**: `[your_adzuna_app_key]`
 3. Click **Add secret**
 
 ## ✅ What Happens Next
@@ -65,7 +68,7 @@ After adding secrets:
 
 After adding the secrets, you can test immediately:
 
-1. Go to: https://github.com/ahmedmobarak1994/jobscannercloud/actions
+1. Go to your repository's Actions tab: `https://github.com/YOUR_USERNAME/YOUR_REPO/actions`
 2. Click on **Scan Jobs Daily** workflow
 3. Click **Run workflow** (dropdown button)
 4. Click the green **Run workflow** button
@@ -107,7 +110,7 @@ Each query searches for Dutch jobs and returns 20-50 relevant positions.
 
 ### To verify secrets are set
 
-1. Go to: https://github.com/ahmedmobarak1994/jobscannercloud/settings/secrets/actions
+1. Go to your repository's secrets page: `https://github.com/YOUR_USERNAME/YOUR_REPO/settings/secrets/actions`
 2. You should see both secrets listed (values are hidden for security)
 
 ## 🎯 Files Updated in This PR
