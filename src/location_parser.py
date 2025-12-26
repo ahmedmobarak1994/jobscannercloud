@@ -311,21 +311,35 @@ class GeoFilter:
             if any(c in self.blocked_countries for c in loc.countries):
                 return False, f"blocked country: {loc.countries}", loc
 
-            # CRITICAL: Single country (e.g., "Remote - Poland") usually means residency required
-            # Only allow if it's in a small whitelist OR if location explicitly says "EMEA/EU"
+            # CRITICAL: Single country (e.g., "Remote - Poland") = residency restriction!
+            # We only allow multi-country OR explicit EMEA/EU context
             if len(loc.countries) == 1:
                 single_country = list(loc.countries)[0]
 
-                # Check if location text ALSO mentions EMEA/EU/Europe (then it's broad)
+                # Check if location text has EXPLICIT broad context
                 location_lower = raw_location.lower()
-                if any(r in location_lower for r in ['emea', 'europe', 'european', ' eu ']):
-                    return True, f"EU country + EMEA/EU context: {single_country}", loc
 
-                # Otherwise: single-country remote = likely residency requirement = BLOCK
-                return False, f"single-country remote (residency likely required): {single_country}", loc
+                # STRICT: Must have ", emea" or "- emea" pattern (not just "poland" in text)
+                has_broad_context = any(pattern in location_lower for pattern in [
+                    ', emea',
+                    '- emea',
+                    '(emea)',
+                    ', europe',
+                    '- europe',
+                    '(europe)',
+                    ', eu',
+                    '- eu',
+                    '(eu)'
+                ])
 
-            # Multiple EU countries = probably OK
-            if any(c in self.eu_countries for c in loc.countries):
+                if has_broad_context:
+                    return True, f"single-country with EMEA/EU context: {single_country}", loc
+
+                # Otherwise: BLOCK (residency requirement)
+                return False, f"single-country remote (residency required): {single_country}", loc
+
+            # Multiple EU countries = probably OK (e.g., "Amsterdam, Netherlands; Berlin, Germany")
+            if len(loc.countries) > 1 and any(c in self.eu_countries for c in loc.countries):
                 return True, f"multi-country EU remote: {loc.countries}", loc
 
             # Unknown multi-country - block by default
