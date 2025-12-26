@@ -33,12 +33,24 @@ jobs:
           else
             echo "❌ Slack webhook NOT set!"
           fi
+          
+          echo "🔍 Checking Adzuna credentials..."
+          if [ -n "${{ secrets.ADZUNA_APP_ID }}" ] && [ -n "${{ secrets.ADZUNA_APP_KEY }}" ]; then
+            echo "✅ Adzuna credentials exist in GitHub secrets"
+          else
+            echo "⚠️  Adzuna credentials NOT set - Adzuna scanner will be skipped"
+            echo "   Add ADZUNA_APP_ID and ADZUNA_APP_KEY to GitHub secrets"
+          fi
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
 
       - name: Run FRESH scan
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
         run: |
           echo "🚀 Running fresh scan with NO cache..."
           python3 jobhunt.py --config config.balanced.json scan
